@@ -3,6 +3,8 @@ package js.log4j;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import org.junit.Ignore;
+
 import js.lang.ConfigBuilder;
 import js.lang.ConfigException;
 import js.log.Log;
@@ -10,6 +12,7 @@ import js.log.LogFactory;
 import js.log.LogProvider;
 import junit.framework.TestCase;
 
+@Ignore
 public class LogConfigUnitTest extends TestCase {
 	public void testLogFactoryConfig() throws FileNotFoundException, ConfigException {
 		System.setProperty("logs", "fixture");
