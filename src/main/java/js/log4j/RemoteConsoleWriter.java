@@ -23,82 +23,73 @@ import org.apache.log4j.helpers.LogLog;
  * 
  * @author Iulian Rotaru
  */
-final class RemoteConsoleWriter extends Writer implements Runnable
+public class RemoteConsoleWriter extends Writer implements Runnable
 {
-  /**
-   * Remote console print writer instance.
-   */
-  private static RemoteConsoleWriter instance;
-
-  /**
-   * Remote console print writer factory.
-   * 
-   * @param port optional port mandatory when create for the first time.
-   * @return remote console print writer instance.
-   */
-  static Writer getInstance(int port)
-  {
-    if(instance == null) {
-      instance = new RemoteConsoleWriter(port);
-    }
-    return instance;
-  }
-
-  static Writer getInstance()
-  {
-    assert instance != null;
-    return instance;
-  }
-
-  /**
-   * Shutdown message used to stop socket server.
-   */
+  /** Shutdown message used to stop socket server. */
   private static final String SHUTDOWN = "SD";
 
-  /**
-   * Socket server thread stop timeout.
-   */
+  /** Socket server thread stop timeout. */
   private static final int SHUTDOWN_TIMEOUT = 2000;
 
-  /**
-   * Log messages queue capacity.
-   */
+  /** Log messages queue capacity. */
   private static final int QUEUE_CAPACITY = 1000;
 
-  /**
-   * Socket server listening port.
-   */
-  private int port;
+  /** String builder for temporary log messages storage. */
+  private final StringBuilder builder = new StringBuilder();
 
-  /**
-   * String builder for temporary log messages storage.
-   */
-  private StringBuilder builder = new StringBuilder();
+  /** Log messages queue. */
+  private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>(QUEUE_CAPACITY);
 
-  /**
-   * Log messages queue.
-   */
-  private BlockingQueue<String> queue;
+  /** Socket server listening port. */
+  private final int port;
 
-  /**
-   * Remote connection thread.
-   */
-  private Thread thread;
+  /** Server socket waiting for remote client connection. Only one client at a time is accepted. */
+  private final ServerSocket server;
+
+  /** Thread running the server. */
+  private final Thread thread;
 
   /**
    * Create remote console writer instance.
    * 
    * @param port remote console port.
    */
-  private RemoteConsoleWriter(int port)
+  public RemoteConsoleWriter(int port)
   {
     debug("Create remote console server instance.");
 
+    ServerSocket server = null;
+    Thread thread = null;
+    try {
+      server = new ServerSocket();
+      thread = new Thread(this);
+      thread.setDaemon(true);
+      thread.start();
+    }
+    catch(IOException e) {
+      error("Error creating the server. Remote console writer is unable to process appender messages.");
+    }
+
     this.port = port;
-    this.queue = new LinkedBlockingQueue<String>(QUEUE_CAPACITY);
-    this.thread = new Thread(this);
-    this.thread.setDaemon(true);
-    this.thread.start();
+    this.server = server;
+    this.thread = thread;
+  }
+
+  /**
+   * Test constructor.
+   * 
+   * @param server server socket mock.
+   */
+  public RemoteConsoleWriter(ServerSocket server)
+  {
+    this.port = 0;
+    this.thread = null;
+    this.server = server;
+  }
+
+  public BlockingQueue<String> getQueue()
+  {
+    return queue;
   }
 
   /**
@@ -107,7 +98,7 @@ final class RemoteConsoleWriter extends Writer implements Runnable
   @Override
   public void write(char[] cbuf, int off, int len) throws IOException
   {
-    this.builder.append(cbuf, off, len);
+    builder.append(cbuf, off, len);
   }
 
   /**
@@ -117,21 +108,21 @@ final class RemoteConsoleWriter extends Writer implements Runnable
   public void flush() throws IOException
   {
     for(;;) {
-      int index = indexOneOf(this.builder, '\r', '\n');
+      int index = indexOneOf(builder, '\r', '\n');
       if(index == -1) {
         break;
       }
       // ignore false returned by offer when queue is full
-      this.queue.offer(this.builder.substring(0, index));
+      queue.offer(builder.substring(0, index));
 
-      if(this.builder.charAt(index) == '\r') {
+      if(builder.charAt(index) == '\r') {
         ++index;
       }
-      if(this.builder.charAt(index) != '\n') {
+      if(builder.charAt(index) != '\n') {
         throw new IllegalStateException();
       }
       ++index;
-      this.builder.delete(0, index);
+      builder.delete(0, index);
     }
   }
 
@@ -159,21 +150,21 @@ final class RemoteConsoleWriter extends Writer implements Runnable
       try {
         // try to break server.accept in order to force queue reading on thread
         Socket socket = new Socket();
-        socket.connect(new InetSocketAddress(this.port), 500);
+        socket.connect(new InetSocketAddress(port), 500);
         socket.close();
       }
       catch(IOException e) {
         error(e);
       }
 
-      this.queue.clear();
-      this.queue.offer(SHUTDOWN);
+      queue.clear();
+      queue.offer(SHUTDOWN);
 
       try {
         wait(SHUTDOWN_TIMEOUT);
       }
       catch(InterruptedException unused) {
-        this.thread.interrupt();
+        thread.interrupt();
       }
     }
   }
@@ -186,17 +177,15 @@ final class RemoteConsoleWriter extends Writer implements Runnable
   {
     debug("Start remote console thread |%s|.", Thread.currentThread().getId());
 
-    ServerSocket server;
     try {
-      server = new ServerSocket();
       server.setReuseAddress(true);
-      server.bind(new InetSocketAddress(this.port));
+      server.bind(new InetSocketAddress(port));
     }
     catch(IOException e) {
-      throw new IllegalStateException(String.format("Fail to create remote console server socket on port |%d|. Abort execution thread.", this.port));
+      throw new IllegalStateException(String.format("Fail to create remote console server socket on port |%d|. Abort execution thread.", port));
     }
 
-    debug("Open remote console server for listening on |%s:%d|. Waiting for console client.", server.getInetAddress(), this.port);
+    debug("Open remote console server for listening on |%s:%d|. Waiting for console client.", server.getInetAddress(), port);
     SERVER_LOOP: for(;;) {
       if(Thread.interrupted()) {
         debug("Server thread has been interrupted. Exit server loop.");
@@ -229,7 +218,7 @@ final class RemoteConsoleWriter extends Writer implements Runnable
       for(;;) {
         String message = null;
         try {
-          message = this.queue.take();
+          message = queue.take();
         }
         catch(InterruptedException unused) {
           Thread.currentThread().interrupt();

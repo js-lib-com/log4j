@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Layout;
 import org.apache.log4j.spi.ErrorCode;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * Log4j appender used to send events to a remote console server. Instance of this appender obtain a remote console
- * {@link RemoteConsoleWriter writer} reference then simply write the formatted event. This appender support <code>Port</code>
- * property; below is a configuration example for log4j.properties:
+ * {@link RemoteConsoleWriter writer} reference then simply write the formatted event. This appender support
+ * <code>Port</code> property; below is a configuration example for log4j.properties:
  * 
  * <pre>
  * log4j.appender.CON=js.log.RemoteConsoleAppender
@@ -23,20 +24,30 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class RemoteConsoleAppender extends AppenderSkeleton
 {
-  /**
-   * Socket server listening port.
-   */
+  /** Socket server listening port. */
   private static final int DEFAULT_PORT = 8001;
 
-  /**
-   * Remote console writer port. Use this value to initialize remote console {@link RemoteConsoleWriter writer}.
-   */
+  /** Remote console writer port. Use this value to initialize remote console {@link RemoteConsoleWriter writer}. */
   private int port = DEFAULT_PORT;
 
-  /**
-   * Remote console writer.
-   */
+  /** Remote console writer. */
   private Writer writer;
+
+  public RemoteConsoleAppender()
+  {
+  }
+
+  /**
+   * Test constructor.
+   * 
+   * @param layout mock layout,
+   * @param writer mock writer.
+   */
+  public RemoteConsoleAppender(Layout layout, Writer writer)
+  {
+    this.layout = layout;
+    this.writer = writer;
+  }
 
   /**
    * Get remote console writer listening port.
@@ -75,21 +86,21 @@ public class RemoteConsoleAppender extends AppenderSkeleton
    * @param event logging event.
    */
   @Override
-  protected void append(LoggingEvent event)
+  public void append(LoggingEvent event)
   {
-    if(this.layout == null) {
-      this.errorHandler.error("No layout for appender " + this.name, null, ErrorCode.MISSING_LAYOUT);
+    if(layout == null) {
+      errorHandler.error("No layout for appender " + name, null, ErrorCode.MISSING_LAYOUT);
       return;
     }
-    if(this.writer == null) {
-      this.writer = RemoteConsoleWriter.getInstance(this.port);
+    if(writer == null) {
+      writer = new RemoteConsoleWriter(port);
     }
     try {
-      this.writer.write(this.layout.format(event));
-      this.writer.flush();
+      writer.write(layout.format(event));
+      writer.flush();
     }
     catch(IOException e) {
-      this.errorHandler.error(e.getMessage(), null, ErrorCode.WRITE_FAILURE);
+      errorHandler.error(e.getMessage(), null, ErrorCode.WRITE_FAILURE);
     }
   }
 
@@ -99,12 +110,12 @@ public class RemoteConsoleAppender extends AppenderSkeleton
   @Override
   public void close()
   {
-    if(this.writer != null) {
+    if(writer != null) {
       try {
-        this.writer.close();
+        writer.close();
       }
       catch(IOException e) {
-        this.errorHandler.error(e.getMessage(), null, ErrorCode.CLOSE_FAILURE);
+        errorHandler.error(e.getMessage(), null, ErrorCode.CLOSE_FAILURE);
       }
     }
   }

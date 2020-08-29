@@ -7,7 +7,7 @@ import org.apache.log4j.Level;
  * 
  * @author Iulian Rotaru
  */
-final class LevelEx extends Level {
+public final class LevelEx extends Level {
 	/** Java serialization version. */
 	private static final long serialVersionUID = -7471659043722589379L;
 
@@ -46,7 +46,7 @@ final class LevelEx extends Level {
 				return BUG;
 			}
 		}
-		return toLevel(levelName);
+		return Level.toLevel(levelName);
 	}
 
 	/**
@@ -62,7 +62,7 @@ final class LevelEx extends Level {
 		if (levelValue == BUG_INT) {
 			return BUG;
 		}
-		return toLevel(levelValue, Level.DEBUG);
+		return Level.toLevel(levelValue);
 	}
 
 	/**
