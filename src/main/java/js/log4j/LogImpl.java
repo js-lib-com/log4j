@@ -21,7 +21,7 @@ final class LogImpl extends AbstractLog {
 	private static final int MAX_MESSAGE_LENGTH = 2048;
 
 	/** Underlying Apache log4j logger delegated for actual logging record writing. */
-	private Logger log4jLogger;
+	private final Logger log4jLogger;
 
 	/**
 	 * Construct logger instance for specified target class.
@@ -54,7 +54,7 @@ final class LogImpl extends AbstractLog {
 	@Override
 	public void print(LogLevel level, String message) {
 		if (isLoggable(level)) {
-			log4jLogger.log(LevelMap.log4jLevel(level), ellipsis(message(message), MAX_MESSAGE_LENGTH));
+			log4jLogger.log(LevelMap.log4jLevel(level), ellipsis(message, MAX_MESSAGE_LENGTH));
 		}
 	}
 }
