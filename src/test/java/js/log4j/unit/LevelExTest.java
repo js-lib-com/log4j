@@ -1,7 +1,7 @@
 package js.log4j.unit;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import org.apache.log4j.Level;
 import org.junit.Test;

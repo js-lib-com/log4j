@@ -25,6 +25,11 @@ public final class LogProviderImpl implements LogProvider
   /** Reusable log context instance. */
   private final LogContext logContext = new LogContextImpl();
 
+  public LogProviderImpl()
+  {
+    Log4jMXBeanImpl.create();
+  }
+
   /**
    * Current implementation uses underlying <code>log4j.properties</code> configuration and this method is NOP.
    * 
