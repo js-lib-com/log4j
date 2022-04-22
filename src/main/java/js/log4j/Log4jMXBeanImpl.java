@@ -1,5 +1,7 @@
 package js.log4j;
 
+import static java.lang.String.format;
+ 
 import java.lang.management.ManagementFactory;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -25,13 +27,12 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   public static final String MX_BEAN_NAME = "com.js-lib:type=Log4j";
 
   private static Log4jMXBean instance;
-  private static final Object mutex = new Object();
 
   /** Create managed bean singleton instance. */
   public static void create()
   {
     if(instance == null) {
-      synchronized(mutex) {
+      synchronized(Log4jMXBeanImpl.class) {
         if(instance == null) {
 
           instance = new Log4jMXBeanImpl();
@@ -40,22 +41,24 @@ public class Log4jMXBeanImpl implements Log4jMXBean
             objName = new ObjectName(MX_BEAN_NAME);
           }
           catch(MalformedObjectNameException e) {
-            throw new IllegalStateException(String.format("Invalid hard coded MX bean name |%s|.", MX_BEAN_NAME));
+            throw new IllegalStateException(format("Invalid hard coded MX bean name |%s|.", MX_BEAN_NAME));
           }
 
           if(objName != null) {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             try {
-              server.registerMBean(instance, objName);
+              if(!server.isRegistered(objName)) {
+                server.registerMBean(instance, objName);
+              }
             }
             catch(InstanceAlreadyExistsException e) {
-              throw new IllegalStateException(String.format("Attempt to recreate MX bean |%s| singleton instance.", Log4jMXBean.class));
+              throw new IllegalStateException(format("Attempt to recreate MX bean |%s| singleton instance.", Log4jMXBean.class));
             }
             catch(MBeanRegistrationException e) {
-              throw new IllegalStateException(String.format("MX bean |%s| registration exception: %s", Log4jMXBean.class, e));
+              throw new IllegalStateException(format("MX bean |%s| registration exception: %s", Log4jMXBean.class, e));
             }
             catch(NotCompliantMBeanException e) {
-              throw new IllegalStateException(String.format("Invalid MX bean |%s| format.", Log4jMXBean.class));
+              throw new IllegalStateException(format("Invalid MX bean |%s| format.", Log4jMXBean.class));
             }
           }
         }
