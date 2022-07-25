@@ -1,7 +1,7 @@
 package js.log4j;
 
 import static java.lang.String.format;
- 
+
 import java.lang.management.ManagementFactory;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -11,9 +11,10 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import js.log.LogLevel;
 
@@ -85,7 +86,7 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   public void setLevel(String name, String level)
   {
     if(name != null) {
-      setLevel(LogManager.exists(name), level);
+      setLevel(LogManager.getLogger(name), level);
     }
   }
 
@@ -93,7 +94,7 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   @Override
   public String getLevel(String name)
   {
-    return name != null ? getLevel(LogManager.exists(name)) : null;
+    return name != null ? getLevel(LogManager.getLogger(name)) : null;
   }
 
   /**
@@ -107,7 +108,7 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   {
     if(logger != null && level != null) {
       try {
-        logger.setLevel(LevelMap.log4jLevel(LogLevel.valueOf(level)));
+        Configurator.setLevel(logger.getName(), LevelMap.log4jLevel(LogLevel.valueOf(level)));
       }
       catch(IllegalArgumentException unused) {}
     }

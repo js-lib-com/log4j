@@ -3,7 +3,6 @@ package js.log4j.unit;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class Log4jMXBeanTest
 {
   private static final String[] LEVELS = new String[]
   {
-      "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "BUG", "OFF"
+      "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF"
   };
 
   private Log4jMXBean bean;
@@ -47,7 +46,7 @@ public class Log4jMXBeanTest
 
     Log log = LogFactory.getLog(LOGGER_NAME);
     assertThat(log, notNullValue());
-    assertThat(bean.getLevel(LOGGER_NAME), nullValue());
+    assertThat(bean.getLevel(LOGGER_NAME), equalTo("OFF"));
 
     for(String level : LEVELS) {
       bean.setLevel(LOGGER_NAME, level);

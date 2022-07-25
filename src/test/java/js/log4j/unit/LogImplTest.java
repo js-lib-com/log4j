@@ -10,9 +10,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +39,7 @@ public class LogImplTest
   @Test
   public void isLoggable_DEBUG_true()
   {
-    when(logger.isEnabledFor(Level.DEBUG)).thenReturn(true);
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
     assertThat(log.isLoggable(LogLevel.DEBUG), equalTo(true));
     assertThat(log.isLoggable(LogLevel.INFO), equalTo(false));
   }
@@ -48,7 +47,7 @@ public class LogImplTest
   @Test
   public void isLoggable_DEBUG_false()
   {
-    when(logger.isEnabledFor(Level.DEBUG)).thenReturn(false);
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(false);
     assertThat(log.isLoggable(LogLevel.DEBUG), equalTo(false));
     assertThat(log.isLoggable(LogLevel.INFO), equalTo(false));
   }
@@ -70,13 +69,13 @@ public class LogImplTest
   public void log_NullMessage()
   {
     log.log(LogLevel.DEBUG, null);
-    verify(logger, times(0)).log(any(Priority.class), anyString());
+    verify(logger, times(0)).log(any(Level.class), anyString());
   }
 
   @Test
   public void dump()
   {
-    when(logger.isEnabledFor(Level.FATAL)).thenReturn(true);
+    when(logger.isEnabled(Level.FATAL)).thenReturn(true);
 
     Throwable exception = new IOException("IO exception.");
     log.dump("Dump message:", exception);
@@ -94,15 +93,15 @@ public class LogImplTest
   @Test
   public void dump_Disabled()
   {
-    when(logger.isEnabledFor(Level.FATAL)).thenReturn(false);
+    when(logger.isEnabled(Level.FATAL)).thenReturn(false);
     log.dump("Dump message:", new IOException("IO exception."));
-    verify(logger, times(0)).log(any(Priority.class), anyString(), any(Throwable.class));
+    verify(logger, times(0)).log(any(Level.class), anyString(), any(Throwable.class));
   }
 
   @Test
   public void print()
   {
-    when(logger.isEnabledFor(Level.DEBUG)).thenReturn(true);
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
     log.print(LogLevel.DEBUG, "Debug message.");
 
     ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
@@ -116,7 +115,7 @@ public class LogImplTest
   @Test
   public void print_NullMessage()
   {
-    when(logger.isEnabledFor(Level.DEBUG)).thenReturn(true);
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
     log.print(LogLevel.DEBUG, null);
 
     ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
@@ -130,7 +129,7 @@ public class LogImplTest
   @Test
   public void print_Disabled()
   {
-    when(logger.isEnabledFor(Level.DEBUG)).thenReturn(false);
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(false);
     log.print(LogLevel.DEBUG, "Debug message.");
     verify(logger, times(0)).log(any(Level.class), anyString());
   }

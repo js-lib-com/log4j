@@ -1,12 +1,21 @@
 package js.log4j;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Layout;
-import org.apache.log4j.spi.ErrorCode;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 /**
  * Log4j appender used to send events to a remote console server. Instance of this appender obtain a remote console
@@ -22,8 +31,26 @@ import org.apache.log4j.spi.LoggingEvent;
  * 
  * @author Iulian Rotaru
  */
-public class RemoteConsoleAppender extends AppenderSkeleton
+@Plugin(name = "RemoteConsoleAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE)
+public class RemoteConsoleAppender extends AbstractAppender
 {
+  @PluginFactory
+  public static RemoteConsoleAppender createAppender( //
+      @PluginAttribute("name") String name, //
+      @PluginElement("Layout") Layout<? extends Serializable> layout, //
+      @PluginElement("Filter") final Filter filter, //
+      @PluginAttribute("otherAttribute") String otherAttribute)
+  {
+    if(name == null) {
+      LOGGER.error("There is no name provided for MyCustomAppender");
+      return null;
+    }
+    if(layout == null) {
+      layout = PatternLayout.createDefaultLayout();
+    }
+    return new RemoteConsoleAppender(name, filter, layout, true);
+  }
+
   /** Socket server listening port. */
   private static final int DEFAULT_PORT = 8001;
 
@@ -33,19 +60,14 @@ public class RemoteConsoleAppender extends AppenderSkeleton
   /** Remote console writer. */
   private Writer writer;
 
-  public RemoteConsoleAppender()
+  protected RemoteConsoleAppender(String name, Filter filter, Layout<?> layout, boolean ignoreExceptions)
   {
+    super(name, filter, layout, ignoreExceptions, (Property[])null);
   }
 
-  /**
-   * Test constructor.
-   * 
-   * @param layout mock layout,
-   * @param writer mock writer.
-   */
-  public RemoteConsoleAppender(Layout layout, Writer writer)
+  public RemoteConsoleAppender(Layout<?> layout, RemoteConsoleWriter writer)
   {
-    this.layout = layout;
+    super("test", null, layout, false, (Property[])null);
     this.writer = writer;
   }
 
@@ -70,37 +92,26 @@ public class RemoteConsoleAppender extends AppenderSkeleton
   }
 
   /**
-   * Configurators call this method to determine if the appender requires a layout.
-   * 
-   * @return always return true.
-   */
-  @Override
-  public boolean requiresLayout()
-  {
-    return true;
-  }
-
-  /**
    * Subclasses of AppenderSkeleton should implement this method to perform actual logging.
    * 
    * @param event logging event.
    */
   @Override
-  public void append(LoggingEvent event)
+  public void append(LogEvent event)
   {
-    if(layout == null) {
-      errorHandler.error("No layout for appender " + name, null, ErrorCode.MISSING_LAYOUT);
+    if(getLayout() == null) {
+      error("No layout for appender " + getName());
       return;
     }
     if(writer == null) {
       writer = new RemoteConsoleWriter(port);
     }
     try {
-      writer.write(layout.format(event));
+      writer.write(new String(getLayout().toByteArray(event)));
       writer.flush();
     }
     catch(IOException e) {
-      errorHandler.error(e.getMessage(), null, ErrorCode.WRITE_FAILURE);
+      error(e.getMessage());
     }
   }
 
@@ -108,14 +119,14 @@ public class RemoteConsoleAppender extends AppenderSkeleton
    * Release any resources allocated within the appender such as file handles, network connections, etc.
    */
   @Override
-  public void close()
+  public void stop()
   {
     if(writer != null) {
       try {
         writer.close();
       }
       catch(IOException e) {
-        errorHandler.error(e.getMessage(), null, ErrorCode.CLOSE_FAILURE);
+        error(e.getMessage());
       }
     }
   }

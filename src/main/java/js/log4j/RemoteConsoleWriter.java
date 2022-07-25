@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.helpers.LogLog;
+import org.apache.logging.log4j.status.StatusLogger;
 
 /**
  * Remote console writer. Send logging messages to connected remote console; if none connected messages are stored up to
@@ -275,7 +275,7 @@ public class RemoteConsoleWriter extends Writer implements Runnable
    */
   private static void debug(String message, Object... args)
   {
-    LogLog.debug(String.format(message, args));
+    StatusLogger.getLogger().debug(String.format(message, args));
   }
 
   /**
@@ -286,6 +286,6 @@ public class RemoteConsoleWriter extends Writer implements Runnable
    */
   private static void error(Object message, Object... args)
   {
-    LogLog.error(String.format(message.toString(), args));
+    StatusLogger.getLogger().error(String.format(message.toString(), args));
   }
 }

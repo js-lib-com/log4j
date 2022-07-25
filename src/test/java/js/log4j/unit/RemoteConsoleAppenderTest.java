@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import org.apache.log4j.Layout;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,9 +26,9 @@ public class RemoteConsoleAppenderTest
   @Mock
   private RemoteConsoleWriter writer;
   @Mock
-  private Layout layout;
+  private Layout<?> layout;
   @Mock
-  private LoggingEvent event;
+  private LogEvent event;
 
   private RemoteConsoleAppender appender;
 
@@ -41,7 +41,7 @@ public class RemoteConsoleAppenderTest
   @Test
   public void append() throws IOException
   {
-    when(layout.format(event)).thenReturn("Debug message.");
+    when(layout.toByteArray(event)).thenReturn("Debug message.".getBytes());
     appender.append(event);
 
     ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
@@ -53,7 +53,7 @@ public class RemoteConsoleAppenderTest
   
   @Test
   public void close() throws IOException {
-    appender.close();
+    appender.stop();
     verify(writer, times(1)).close();
   }
 }

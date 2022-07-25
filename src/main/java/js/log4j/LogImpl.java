@@ -1,6 +1,7 @@
 package js.log4j;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import js.log.AbstractLog;
 import js.log.Log;
@@ -30,7 +31,7 @@ public final class LogImpl extends AbstractLog
    */
   public LogImpl(String loggerName)
   {
-    this.log4jLogger = Logger.getLogger(loggerName);
+    this.log4jLogger = LogManager.getLogger(loggerName);
   }
 
   // test constructor
@@ -42,7 +43,7 @@ public final class LogImpl extends AbstractLog
   @Override
   public boolean isLoggable(LogLevel level)
   {
-    return log4jLogger.isEnabledFor(LevelMap.log4jLevel(level));
+    return log4jLogger.isEnabled(LevelMap.log4jLevel(level));
   }
 
   @Override

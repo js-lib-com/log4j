@@ -3,7 +3,7 @@ package js.log4j;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import js.log.LogLevel;
 
@@ -20,13 +20,12 @@ final class LevelMap
   private static final Level[] LOG4J_LEVEL_MAP = new Level[]
   {
       //
-      LevelEx.TRACE, // LogLevel.TRACE
+      Level.TRACE, // LogLevel.TRACE
       Level.DEBUG, // LogLevel.DEBUG
       Level.INFO, // LogLevel.INFO
       Level.WARN, // LogLevel.WARN
       Level.ERROR, // LogLevel.ERROR
       Level.FATAL, // LogLevel.FATAL
-      LevelEx.BUG, // LogLevel.BUG
       Level.OFF // LogLevel.OFF
   };
 
@@ -47,15 +46,14 @@ final class LevelMap
 
   private static Map<Integer, LogLevel> LOG_LEVEL_MAP = new HashMap<>();
   static {
-    LOG_LEVEL_MAP.put(Level.ALL_INT, LogLevel.TRACE);
-    LOG_LEVEL_MAP.put(LevelEx.TRACE_INT, LogLevel.TRACE);
-    LOG_LEVEL_MAP.put(Level.DEBUG_INT, LogLevel.DEBUG);
-    LOG_LEVEL_MAP.put(Level.INFO_INT, LogLevel.INFO);
-    LOG_LEVEL_MAP.put(Level.WARN_INT, LogLevel.WARN);
-    LOG_LEVEL_MAP.put(Level.ERROR_INT, LogLevel.ERROR);
-    LOG_LEVEL_MAP.put(Level.FATAL_INT, LogLevel.FATAL);
-    LOG_LEVEL_MAP.put(LevelEx.BUG_INT, LogLevel.BUG);
-    LOG_LEVEL_MAP.put(Level.OFF_INT, LogLevel.OFF);
+    LOG_LEVEL_MAP.put(Level.ALL.intLevel(), LogLevel.TRACE);
+    LOG_LEVEL_MAP.put(Level.TRACE.intLevel(), LogLevel.TRACE);
+    LOG_LEVEL_MAP.put(Level.DEBUG.intLevel(), LogLevel.DEBUG);
+    LOG_LEVEL_MAP.put(Level.INFO.intLevel(), LogLevel.INFO);
+    LOG_LEVEL_MAP.put(Level.WARN.intLevel(), LogLevel.WARN);
+    LOG_LEVEL_MAP.put(Level.ERROR.intLevel(), LogLevel.ERROR);
+    LOG_LEVEL_MAP.put(Level.FATAL.intLevel(), LogLevel.FATAL);
+    LOG_LEVEL_MAP.put(Level.OFF.intLevel(), LogLevel.OFF);
   }
 
   /**
@@ -67,7 +65,7 @@ final class LevelMap
    */
   static LogLevel logLevel(Level level)
   {
-    LogLevel logLevel = LOG_LEVEL_MAP.get(level.toInt());
+    LogLevel logLevel = LOG_LEVEL_MAP.get(level.intLevel());
     if(logLevel == null) {
       throw new IllegalStateException(String.format("Log4j level |%s| not mapped.", level));
     }
