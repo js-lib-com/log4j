@@ -1,11 +1,10 @@
 package js.log4j;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import js.log.AbstractLog;
-import js.log.Log;
-import js.log.LogLevel;
+import com.jslib.api.log.Log;
 
 /**
  * Thin wrapper on Apache log4j {@link Logger}, implementing j(s)-lib {@link Log} interface. Apache log4j engine should
@@ -41,32 +40,24 @@ public final class LogImpl extends AbstractLog
   }
 
   @Override
-  public boolean isLoggable(LogLevel level)
+  public boolean isLoggable(Level level)
   {
-    return log4jLogger.isEnabled(LevelMap.log4jLevel(level));
+    return log4jLogger.isEnabled(level);
   }
 
   @Override
-  public void log(LogLevel level, String message)
+  public void log(Level level, String message)
   {
     if(message != null) {
-      log4jLogger.log(LevelMap.log4jLevel(level), ellipsis(message, MAX_MESSAGE_LENGTH));
+      log4jLogger.log(level, ellipsis(message, MAX_MESSAGE_LENGTH));
     }
   }
 
   @Override
   public void dump(Object message, Throwable throwable)
   {
-    if(isLoggable(LogLevel.FATAL)) {
-      log4jLogger.log(LevelMap.log4jLevel(LogLevel.FATAL), ellipsis(message(message), MAX_MESSAGE_LENGTH), throwable);
-    }
-  }
-
-  @Override
-  public void print(LogLevel level, String message)
-  {
-    if(isLoggable(level)) {
-      log4jLogger.log(LevelMap.log4jLevel(level), ellipsis(message, MAX_MESSAGE_LENGTH));
+    if(isLoggable(Level.FATAL)) {
+      log4jLogger.log(Level.FATAL, ellipsis(message(message), MAX_MESSAGE_LENGTH), throwable);
     }
   }
 }

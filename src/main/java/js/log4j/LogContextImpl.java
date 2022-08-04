@@ -2,7 +2,7 @@ package js.log4j;
 
 import org.apache.logging.log4j.ThreadContext;
 
-import js.log.LogContext;
+import com.jslib.api.log.LogContext;
 
 public class LogContextImpl implements LogContext
 {

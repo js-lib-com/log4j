@@ -2,10 +2,11 @@ package js.log4j;
 
 import org.apache.logging.log4j.core.LoggerContext;
 
+import com.jslib.api.log.Log;
+import com.jslib.api.log.LogContext;
+import com.jslib.api.log.LogProvider;
+
 import js.lang.Config;
-import js.log.Log;
-import js.log.LogContext;
-import js.log.LogProvider;
 
 /**
  * Implementation for {@link LogProvider} interface. This implementation is rather simple: it is a factory for loggers
@@ -23,18 +24,8 @@ public final class LogProviderImpl implements LogProvider
 
   public LogProviderImpl()
   {
-    this.logContext = new LogContextImpl(); 
+    this.logContext = new LogContextImpl();
     Log4jMXBeanImpl.create();
-  }
-
-  /**
-   * Current implementation uses underlying <code>log4j.properties</code> configuration and this method is NOP.
-   * 
-   * @param config configuration object, not used.
-   */
-  @Override
-  public void config(Config config)
-  {
   }
 
   @Override
@@ -50,7 +41,7 @@ public final class LogProviderImpl implements LogProvider
   }
 
   @Override
-  public void forceImmediateFlush()
+  public void flush()
   {
     LoggerContext.getContext(false).stop();
   }

@@ -7,8 +7,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import org.junit.Before;
 import org.junit.Test;
 
-import js.log.Log;
-import js.log.LogFactory;
+import com.jslib.api.log.Log;
+import com.jslib.api.log.LogFactory;
+
 import js.log4j.Log4jMXBean;
 import js.log4j.Log4jMXBeanImpl;
 

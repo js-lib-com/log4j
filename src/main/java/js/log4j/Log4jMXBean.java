@@ -1,7 +1,5 @@
 package js.log4j;
 
-import js.log.LogLevel;
-
 /**
  * Management bean for log4j adaptor. Allows for logging level manipulation on runtime.
  * 

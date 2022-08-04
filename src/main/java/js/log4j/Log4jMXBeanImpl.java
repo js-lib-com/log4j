@@ -16,8 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import js.log.LogLevel;
-
 /**
  * Implementation for management bean.
  * 
@@ -108,7 +106,7 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   {
     if(logger != null && level != null) {
       try {
-        Configurator.setLevel(logger.getName(), LevelMap.log4jLevel(LogLevel.valueOf(level)));
+        Configurator.setLevel(logger.getName(), Level.valueOf(level));
       }
       catch(IllegalArgumentException unused) {}
     }
@@ -125,11 +123,7 @@ public class Log4jMXBeanImpl implements Log4jMXBean
   {
     if(logger != null) {
       Level level = logger.getLevel();
-      if(level == null) {
-        return null;
-      }
-      LogLevel logLevel = LevelMap.logLevel(level);
-      return logLevel != null ? logLevel.name() : null;
+      return level != null ? level.name() : null;
     }
     return null;
   }

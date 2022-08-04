@@ -2,7 +2,7 @@
  * Logging system. js-lib logging is a thin wrapper for log4j with next features:
  * <ul>
  * <li>log record with formatted message,
- * <li>BUG level, see {@link js.log.LogLevel#BUG},
+ * <li>BUG level, see {@link com.jslib.api.log.LogLevel#BUG},
  * <li>simplified configuration and seamless integration with Tomcat,
  * <li>remote console appender with Eclipse console, see {@link js.log4j.RemoteConsoleAppender}.
  * </ul>

@@ -19,7 +19,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import js.log.LogLevel;
 import js.log4j.LogImpl;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,22 +39,22 @@ public class LogImplTest
   public void isLoggable_DEBUG_true()
   {
     when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
-    assertThat(log.isLoggable(LogLevel.DEBUG), equalTo(true));
-    assertThat(log.isLoggable(LogLevel.INFO), equalTo(false));
+    assertThat(log.isLoggable(Level.DEBUG), equalTo(true));
+    assertThat(log.isLoggable(Level.INFO), equalTo(false));
   }
 
   @Test
   public void isLoggable_DEBUG_false()
   {
     when(logger.isEnabled(Level.DEBUG)).thenReturn(false);
-    assertThat(log.isLoggable(LogLevel.DEBUG), equalTo(false));
-    assertThat(log.isLoggable(LogLevel.INFO), equalTo(false));
+    assertThat(log.isLoggable(Level.DEBUG), equalTo(false));
+    assertThat(log.isLoggable(Level.INFO), equalTo(false));
   }
 
   @Test
   public void log()
   {
-    log.log(LogLevel.DEBUG, "Debug message.");
+    log.log(Level.DEBUG, "Debug message.");
 
     ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
     ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
@@ -68,7 +67,7 @@ public class LogImplTest
   @Test
   public void log_NullMessage()
   {
-    log.log(LogLevel.DEBUG, null);
+    log.log(Level.DEBUG, null);
     verify(logger, times(0)).log(any(Level.class), anyString());
   }
 
@@ -96,41 +95,5 @@ public class LogImplTest
     when(logger.isEnabled(Level.FATAL)).thenReturn(false);
     log.dump("Dump message:", new IOException("IO exception."));
     verify(logger, times(0)).log(any(Level.class), anyString(), any(Throwable.class));
-  }
-
-  @Test
-  public void print()
-  {
-    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
-    log.print(LogLevel.DEBUG, "Debug message.");
-
-    ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
-    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
-    verify(logger, times(1)).log(level.capture(), message.capture());
-
-    assertThat(level.getValue(), equalTo(Level.DEBUG));
-    assertThat(message.getValue(), equalTo("Debug message."));
-  }
-
-  @Test
-  public void print_NullMessage()
-  {
-    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
-    log.print(LogLevel.DEBUG, null);
-
-    ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
-    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
-    verify(logger, times(1)).log(level.capture(), message.capture());
-
-    assertThat(level.getValue(), equalTo(Level.DEBUG));
-    assertThat(message.getValue(), equalTo("null"));
-  }
-
-  @Test
-  public void print_Disabled()
-  {
-    when(logger.isEnabled(Level.DEBUG)).thenReturn(false);
-    log.print(LogLevel.DEBUG, "Debug message.");
-    verify(logger, times(0)).log(any(Level.class), anyString());
   }
 }
