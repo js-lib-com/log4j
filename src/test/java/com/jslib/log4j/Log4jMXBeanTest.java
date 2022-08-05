@@ -1,4 +1,4 @@
-package js.log4j.unit;
+package com.jslib.log4j;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,9 +9,6 @@ import org.junit.Test;
 
 import com.jslib.api.log.Log;
 import com.jslib.api.log.LogFactory;
-
-import js.log4j.Log4jMXBean;
-import js.log4j.Log4jMXBeanImpl;
 
 public class Log4jMXBeanTest
 {

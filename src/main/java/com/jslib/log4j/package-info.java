@@ -4,7 +4,7 @@
  * <li>log record with formatted message,
  * <li>BUG level, see {@link com.jslib.api.log.LogLevel#BUG},
  * <li>simplified configuration and seamless integration with Tomcat,
- * <li>remote console appender with Eclipse console, see {@link js.log4j.RemoteConsoleAppender}.
+ * <li>remote console appender with Eclipse console, see {@link com.jslib.log4j.RemoteConsoleAppender}.
  * </ul>
  * <h3>Formatted Log</h3>
  * Is not uncommon to need adding variables to log record and often it is solved using string concatenation.
@@ -26,5 +26,5 @@
  *
  * @author Iulian Rotaru
  */
-package js.log4j;
+package com.jslib.log4j;
 

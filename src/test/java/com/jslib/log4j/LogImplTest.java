@@ -1,4 +1,4 @@
-package js.log4j.unit;
+package com.jslib.log4j;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,8 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import js.log4j.LogImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LogImplTest

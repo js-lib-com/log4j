@@ -1,4 +1,4 @@
-package js.log4j;
+package com.jslib.log4j;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;

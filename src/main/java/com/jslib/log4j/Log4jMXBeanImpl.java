@@ -1,4 +1,4 @@
-package js.log4j;
+package com.jslib.log4j;
 
 import static java.lang.String.format;
 

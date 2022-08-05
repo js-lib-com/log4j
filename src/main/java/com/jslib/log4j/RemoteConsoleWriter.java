@@ -1,4 +1,4 @@
-package js.log4j;
+package com.jslib.log4j;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

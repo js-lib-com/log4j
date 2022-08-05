@@ -1,1 +1,1 @@
-js.log4j.LogProviderImpl
+com.jslib.log4j.LogProviderImpl
