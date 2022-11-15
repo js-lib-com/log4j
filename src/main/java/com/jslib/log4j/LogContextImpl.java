@@ -21,6 +21,12 @@ public class LogContextImpl implements LogContext
   }
 
   @Override
+  public String get(String name)
+  {
+    return ThreadContext.get(name);
+  }
+
+  @Override
   public void clear()
   {
     ThreadContext.clearAll();

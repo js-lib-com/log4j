@@ -34,64 +34,165 @@ public class LogImplTest
   }
 
   @Test
-  public void isLoggable_DEBUG_true()
+  public void GivenDebugLevelEnabled_WhenSimpleMessage_ThenDebugPrint()
   {
+    // given
     when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
-    assertThat(log.isLoggable(Level.DEBUG), equalTo(true));
-    assertThat(log.isLoggable(Level.INFO), equalTo(false));
-  }
 
-  @Test
-  public void isLoggable_DEBUG_false()
-  {
-    when(logger.isEnabled(Level.DEBUG)).thenReturn(false);
-    assertThat(log.isLoggable(Level.DEBUG), equalTo(false));
-    assertThat(log.isLoggable(Level.INFO), equalTo(false));
-  }
+    // when
+    log.debug("Debug message.");
 
-  @Test
-  public void log()
-  {
-    log.log(Level.DEBUG, "Debug message.");
-
-    ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
+    // then
     ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
-    verify(logger, times(1)).log(level.capture(), message.capture());
+    verify(logger, times(1)).debug(message.capture());
 
-    assertThat(level.getValue(), equalTo(Level.DEBUG));
     assertThat(message.getValue(), equalTo("Debug message."));
   }
 
+  /**
+   * Syntax with named parameter is not supported by log4j and should be processed by this adapter implementation.
+   */
   @Test
-  public void log_NullMessage()
+  public void GivenParameterizedMessage_WhenArgumentPresent_ThenFormatDebugPrint()
   {
-    log.log(Level.DEBUG, null);
-    verify(logger, times(0)).log(any(Level.class), anyString());
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug("Phone {phone}.", "770 555-666");
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    verify(logger, times(1)).debug(message.capture());
+
+    assertThat(message.getValue(), equalTo("Phone 770 555-666."));
   }
 
   @Test
-  public void dump()
+  public void GivenEmptyParameterizedMessage_WhenArgumentPresent_ThenFormatDebugPrint()
   {
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug("Phone {}.", "770 555-666");
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    verify(logger, times(1)).debug(message.capture());
+
+    assertThat(message.getValue(), equalTo("Phone 770 555-666."));
+  }
+
+  @Test
+  public void GivenJavaFormatMessage_WhenArgumentPresent_ThenFormatDebugPrint()
+  {
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug("Phone %s.", "770 555-666");
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    verify(logger, times(1)).debug(message.capture());
+
+    assertThat(message.getValue(), equalTo("Phone 770 555-666."));
+  }
+
+  @Test
+  public void GivenParameterizedMessage_WhenArgumentMissing_ThenPrintOriginalText()
+  {
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug("Phone {phone}.");
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    verify(logger, times(1)).debug(message.capture());
+
+    assertThat(message.getValue(), equalTo("Phone {phone}."));
+  }
+
+  @Test
+  public void GivenEmptyParameterizedMessage_WhenArgumentMissing_ThenPrintOriginalText()
+  {
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug("Phone {}.");
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    verify(logger, times(1)).debug(message.capture());
+
+    assertThat(message.getValue(), equalTo("Phone {}."));
+  }
+
+  @Test
+  public void GivenDebugLevelEnabled_WhenNullMessage_ThenPassNullToLog4j()
+  {
+    // given
+    when(logger.isEnabled(Level.DEBUG)).thenReturn(true);
+
+    // when
+    log.debug(null);
+
+    // then
+    verify(logger, times(1)).debug((String)null);
+  }
+
+  @Test
+  public void GivenFatalLevelEnabled_WhenDump_ThenStackTrace()
+  {
+    // given
     when(logger.isEnabled(Level.FATAL)).thenReturn(true);
 
+    // when
     Throwable exception = new IOException("IO exception.");
     log.dump("Dump message:", exception);
 
-    ArgumentCaptor<Level> level = ArgumentCaptor.forClass(Level.class);
+    // then
     ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<Throwable> throwable = ArgumentCaptor.forClass(Throwable.class);
-    verify(logger, times(1)).log(level.capture(), message.capture(), throwable.capture());
+    verify(logger, times(1)).fatal(message.capture(), throwable.capture());
 
-    assertThat(level.getValue(), equalTo(Level.FATAL));
     assertThat(message.getValue(), equalTo("Dump message:"));
     assertThat(throwable.getValue(), equalTo(exception));
   }
 
   @Test
-  public void dump_Disabled()
+  public void GivenFatalLevelEnabled_WhenDumpWithEmptyMessage_ThenAddGenericMesssage()
   {
+    // given
+    when(logger.isEnabled(Level.FATAL)).thenReturn(true);
+
+    // when
+    Throwable exception = new IOException("IO exception.");
+    log.dump(exception);
+
+    // then
+    ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Throwable> throwable = ArgumentCaptor.forClass(Throwable.class);
+    verify(logger, times(1)).fatal(message.capture(), throwable.capture());
+
+    assertThat(message.getValue(), equalTo("Stack trace dump:"));
+    assertThat(throwable.getValue(), equalTo(exception));
+  }
+
+  @Test
+  public void GivenFatalLevelDisabled_WhenDump_ThenNoStackTrace()
+  {
+    // given
     when(logger.isEnabled(Level.FATAL)).thenReturn(false);
+
+    // when
     log.dump("Dump message:", new IOException("IO exception."));
-    verify(logger, times(0)).log(any(Level.class), anyString(), any(Throwable.class));
+
+    // then
+    verify(logger, times(0)).fatal(anyString(), any(Throwable.class));
   }
 }

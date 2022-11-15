@@ -1,8 +1,10 @@
 package com.jslib.log4j;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 
 import com.jslib.api.log.Log;
+import com.jslib.api.log.LogConfig;
 import com.jslib.api.log.LogContext;
 import com.jslib.api.log.LogProvider;
 import com.jslib.lang.Config;
@@ -30,7 +32,13 @@ public final class LogProviderImpl implements LogProvider
   @Override
   public Log getLogger(String loggerName)
   {
-    return new LogImpl(loggerName);
+    return new LogImpl(LogManager.getLogger(loggerName));
+  }
+
+  @Override
+  public LogConfig getLogConfig()
+  {
+    return null;
   }
 
   @Override
@@ -40,7 +48,7 @@ public final class LogProviderImpl implements LogProvider
   }
 
   @Override
-  public void flush()
+  public void close()
   {
     LoggerContext.getContext(false).stop();
   }

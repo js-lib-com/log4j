@@ -17,7 +17,7 @@
  * </pre>
  * instead of
  * <pre>
- *	log.debug("Class loaded %s.", class.getName());
+ *	log.debug("Class loaded {java_type}.", class.getName());
  * </pre>
  * The second solution executes string formatting only if log level is enabled but check for level is performed into logger writer.
  * <p>   
