@@ -174,7 +174,8 @@ final class LogImpl implements Log
       return null;
     }
     if(throwable.getCause() == null) {
-      return throwable.getMessage();
+      String s = throwable.getMessage();
+      return s != null? s: throwable.getClass().getCanonicalName();
     }
 
     int nestingLevel = 0;
@@ -190,7 +191,7 @@ final class LogImpl implements Log
       if(throwable.getCause() == null) {
         String s = throwable.getMessage();
         if(s == null) {
-          throwable.getClass().getCanonicalName();
+          s = throwable.getClass().getCanonicalName();
         }
         sb.append(s);
         break;
